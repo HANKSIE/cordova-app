@@ -29,22 +29,64 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;"> -->
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
         <meta name="color-scheme" content="light dark">
         <link rel="stylesheet" href="css/index.css">
+          <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        <!-- Include the compiled Ratchet CSS -->
+        <link href="./vendor/ratchet/css/ratchet.min.css" rel="stylesheet">
+
+        <!-- Include the compiled Ratchet JS -->
+        <script src="./vendor/ratchet/js/ratchet.min.js"></script>
         <title>Hello World</title>
     </head>
     <body>
-        <div class="app">
+        <!-- <div class="app">
             <h1>106021014</h1>
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
+        </div> -->
+         <!-- Make sure all your bars are the first things in your <body> -->
+    <header class="bar bar-nav">
+        <h1 class="title">Ratchet</h1>
+      </header>
+  
+      <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+      <div class="content">
+        <p class="content-padded">Thanks for downloading Ratchet. This is an example HTML page that's linked up to compiled Ratchet CSS and JS, has the proper meta tags and the HTML structure. Need some more help before you start filling this with your own content? Check out some Ratchet resources:</p>
+        <div class="card">
+          <ul class="table-view">
+            <li class="table-view-cell">
+              <a class="push-right" href="./1.html">
+                <strong>夜歸鹿門山歌</strong>
+              </a>
+            </li>
+            <li class="table-view-cell">
+              <a class="push-right" href="./2.html">
+                <strong>琴歌</strong>
+              </a>
+            </li>
+            <li class="table-view-cell">
+              <a class="push-right" href="./3.html">
+                <strong>金陵酒肆留別</strong>
+              </a>
+            </li>
+            <li class="table-view-cell">
+              <a class="push-right" href="./4.html">
+                <strong>漁翁</strong>
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
         <script src="cordova.js"></script>
         <script src="js/index.js"></script>
     </body>
