@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小算盤</title>
+    <link rel="stylesheet" href="../../vendor/ratchet/css/ratchet.min.css">
+    <link rel="stylesheet" href="../../vendor/ratchet/js/ratchet.min.js">
+</head>
+<style>
+    .abacus {
+        display: flex;
+        flex-direction:column;
+    }
+
+    .abacus > .screen {
+        padding: 10px 20px;
+        background-color: #464646;
+        color: white;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .abacus > .panel {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row {
+        display: flex;
+        width: fit-content;
+    }
+
+    .col {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+    }
+
+    .abacus-btn {
+        padding: 10px;
+        margin: 5px;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        border: 0.5px solid #666666;
+    }
+
+    .abacus-btn:hover {
+        cursor: pointer;
+    }
+
+    .cal-btn {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+</style>
+<body>
+    <header class="bar bar-nav">
+        <button id="back" class="btn pull-left" onclick="location.href='../../index.html'">
+            back
+          </button>
+        <h1 class="title">小算盤</h1>
+    </header>
+    <div class="content">
+
+        <div class="abacus" style="margin: auto;">
+            <div class="screen" id="result">
+                0
+            </div>
+            <div class="panel">
+                <div class="segmented-control">
+                    <a class="control-item"><div class="cal-btn" onclick="append(7)">7</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(8)">8</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(9)">9</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('/')">/</div></a>
+                </div>
+                <div class="segmented-control">
+                    <a class="control-item"><div class="cal-btn" onclick="append(4)">4</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(5)">5</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(6)">6</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('*')">*</div></a>
+                </div>
+                <div class="segmented-control">
+                    <a class="control-item"><div class="cal-btn" onclick="append(1)">1</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(2)">2</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append(3)">3</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('-')">-</div></a>
+                </div>
+                <div class="segmented-control">
+                    <a class="control-item"><div class="cal-btn" onclick="append(0)">0</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('.')">.</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('=')">=</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('+')">+</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function append(val){
+        var result = document.getElementById("result");
+        result.innerHTML = result.innerHTML + val;
+    }
+</script>
+</html>
