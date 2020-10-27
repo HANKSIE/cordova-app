@@ -70,9 +70,7 @@
     <div class="content">
 
         <div class="abacus" style="margin: auto;">
-            <div class="screen" id="result">
-                0
-            </div>
+            <div class="screen" id="result">0</div>
             <div class="panel">
                 <div class="segmented-control">
                     <a class="control-item"><div class="cal-btn" onclick="append(7)">7</div></a>
@@ -84,7 +82,7 @@
                     <a class="control-item"><div class="cal-btn" onclick="append(4)">4</div></a>
                     <a class="control-item"><div class="cal-btn" onclick="append(5)">5</div></a>
                     <a class="control-item"><div class="cal-btn" onclick="append(6)">6</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('*')">*</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="append('x')">x</div></a>
                 </div>
                 <div class="segmented-control">
                     <a class="control-item"><div class="cal-btn" onclick="append(1)">1</div></a>
@@ -103,9 +101,51 @@
     </div>
 </body>
 <script>
-    function append(val){
+    var num = undefined;
+    var op = undefined;
+    
+    const operate = {
+        "+": function(v1, v2){return parseInt(v1)+parseInt(v2)},
+        "-": function(v1, v2){return parseInt(v1)-parseInt(v2)},
+        "x": function(v1, v2){return parseInt(v1)*parseInt(v2)},
+        "/": function(v1, v2){return parseInt(v1)/parseInt(v2)},
+    }
+
+    function append(input){
+
+        
         var result = document.getElementById("result");
-        result.innerHTML = result.innerHTML + val;
+
+        if(result.innerHTML == 0){
+            if(!["+","-","x","/","="].includes(input)){
+                result.innerHTML = input;
+            }
+            return;
+        }
+
+        if(["+","-","x","/"].includes(input) && result.innerHTML != 0){
+            op = input;
+            return;
+        }
+
+        if(op && !num){
+            num = result.innerHTML;
+            result.innerHTML = input;
+            return;
+        }
+        
+        if(op && num && input == "="){
+            console.log(`${num} ${op} ${result.innerHTML}`)
+            ans = operate[op](num, result.innerHTML);
+            result.innerHTML = ans;
+            op = undefined;
+            num = ans;
+            console.log(op);
+            console.log(num);
+            return;
+        }
+
+        result.innerHTML = result.innerHTML + input; 
     }
 </script>
 </html>
