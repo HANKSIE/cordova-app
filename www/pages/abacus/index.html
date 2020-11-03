@@ -101,7 +101,7 @@
     </div>
 </body>
 <script>
-    var num = undefined;
+    var num = undefined, sum = 0;
     var op = undefined;
     
     const operate = {
@@ -139,9 +139,8 @@
             ans = operate[op](num, result.innerHTML);
             result.innerHTML = ans;
             op = undefined;
-            num = ans;
-            console.log(op);
-            console.log(num);
+            num = undefined;
+            sum += ans;
             return;
         }
 
