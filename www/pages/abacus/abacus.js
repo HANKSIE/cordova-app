@@ -57,12 +57,13 @@ Abacus.prototype.click = function(input){
 
         this.hasAccessLeft = false;
 
-        if(this.canNumOverrideScreen){
-            this.screen.write(input);
-            this.reset();
-        }else if(this.hasOp() && !this.canAppend){
+        if(this.hasOp() && !this.canAppend){
             this.screen.write(input);
             this.canAppend = !this.canAppend;
+            if(this.canNumOverrideScreen){
+                this.screen.write(input);
+                this.canNumOverrideScreen = false;
+            }
         }else{
             this.screen.append(input);
         }

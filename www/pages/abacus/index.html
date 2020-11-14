@@ -19,6 +19,16 @@
         color: white;
         display: flex;
         justify-content: flex-end;
+        font-size: 20px;
+    }
+
+    .abacus > .screen-expression {
+        padding: 10px 20px;
+        background-color: #464646;
+        color: white;
+        display: flex;
+        justify-content: flex-end;
+        font-size: 11px;
     }
 
     .abacus > .panel {
@@ -70,7 +80,8 @@
     <div class="content">
 
         <div class="abacus" style="margin: auto;">
-            <div class="screen" id="result">0</div>
+            <div class="screen-expression" id="expression"></div>
+            <div class="screen" id="result"></div>
             <div class="panel">
                 <div class="segmented-control">
                     <a class="control-item"><div class="cal-btn" onclick="clickBtn(7)">7</div></a>
@@ -102,7 +113,8 @@
 </body>
 <script src="./abacus.js"></script>
 <script>
-    var abacus = new Abacus(new Screen(document.getElementById("result")));
+    var screen = new Screen(document.getElementById("result"));
+    var abacus = new Abacus(screen);
     function clickBtn(input){
         abacus.click(input);
     }
