@@ -38,7 +38,7 @@ function Abacus(screen){
 Abacus.prototype.click = function(input){
     this.input = input;
     //小數點
-    if(this.isClickPoint()){
+    if(this.isClickPoint() && !this.canNumOverrideScreen){
         if(this.screen.read().indexOf(".") == -1){
             this.screen.append(input);
         }
@@ -56,8 +56,11 @@ Abacus.prototype.click = function(input){
     if(this.isClickNumber()){ //整數
 
         this.hasAccessLeft = false;
-        
-        if((this.hasOp() && !this.canAppend)){
+
+        if(this.canNumOverrideScreen){
+            this.screen.write(input);
+            this.reset();
+        }else if(this.hasOp() && !this.canAppend){
             this.screen.write(input);
             this.canAppend = !this.canAppend;
         }else{
@@ -88,12 +91,15 @@ Abacus.prototype.click = function(input){
                     this.left = result;
                     this.op = op;
                 }
+                this.canNumOverrideScreen = true;
             }
         }
 
         this.op = this.isClickEqual()?undefined:input;
 
     }
+
+    console.log(`${this.left} ${this.op} ${this.right}`);
 }
 
 /**
@@ -105,6 +111,7 @@ Abacus.prototype.reset = function(){
     this.right = undefined;
     this.canAppend = false;
     this.hasAccessLeft = false;
+    this.canNumOverrideScreen = false;
 }
 
 /**
