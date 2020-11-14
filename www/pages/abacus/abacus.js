@@ -9,8 +9,8 @@
 /**
  * @constructor
  * 
- * @param {Screen} screen - 計算機螢幕
- * 
+ * @param {Screen} screen - 螢幕
+ * @param {Screen} expressionScreen - 顯示運算式的螢幕
  * @property {Screen} screen - 計算機螢幕
  * @property {string} left - 左運算元(未轉換為number)
  * @property {string} right - 右運算元(未轉換為number)
@@ -19,8 +19,9 @@
  * @property {bool} hasAccessLeft - 是否正在存取left
  * @property {object} operate - 運算子對應運算方法
  */
-function Abacus(screen){
+function Abacus(screen, expressionScreen){
     this.screen = screen; //螢幕dom
+    this.expressionScreen = expressionScreen
     this.reset();
     this.operate = {
         "+": function(v1, v2){return v1 + v2},
@@ -29,6 +30,7 @@ function Abacus(screen){
         "/": function(v1, v2){return v1 / v2},
     };
     this.screen.write(0);
+    this.expressionScreen.write(0);
 }
 
 /**
@@ -37,23 +39,17 @@ function Abacus(screen){
  */
 Abacus.prototype.click = function(input){
     this.input = input;
+
     //小數點
     if(this.isClickPoint() && !this.canNumOverrideScreen){
         if(this.screen.read().indexOf(".") == -1){
             this.screen.append(input);
         }
-        return;
-    }
-
-    //畫面只有0
-    if(this.isOnlyZeroOnScreen()){
+    }else if(this.isOnlyZeroOnScreen()){  //畫面只有0
         if(this.isClickNumber()){
             this.screen.write(input);
         }
-        return;
-    }
-
-    if(this.isClickNumber()){ //整數
+    }else if(this.isClickNumber()){ //整數
 
         this.hasAccessLeft = false;
 
@@ -69,7 +65,7 @@ Abacus.prototype.click = function(input){
         }
 
     }else{ //運算子
-
+        
         //螢幕上的值是否應為left值
         if(!this.hasAccessLeft){
             if(!this.hasLeft()){
@@ -95,12 +91,19 @@ Abacus.prototype.click = function(input){
                 this.canNumOverrideScreen = true;
             }
         }
-
         this.op = this.isClickEqual()?undefined:input;
-
     }
 
-    console.log(`${this.left} ${this.op} ${this.right}`);
+    var showLeft, showRight;
+
+    if(this.hasOp() && this.isClickNumber()){ //有運算元而且按了數字(代表螢幕上的數字是right)
+        showRight = this.screen.read();
+    }else if(this.isClickNumber()){ //反之為left
+        showLeft = this.screen.read();
+    }
+
+    //算出答案後未將答案指定給left，但left不可能是''，所以若showLeft和left為空時，螢幕上的值就是left
+    this.expressionScreen.write(`${showLeft || this.left || this.screen.read()} ${this.op || ''} ${showRight || this.right || ''}`);
 }
 
 /**
@@ -129,6 +132,14 @@ Abacus.prototype.isOnlyZeroOnScreen = function(){
  */
 Abacus.prototype.isClickEqual = function(){
     return this.input == "=";
+}
+
+/**
+ * 是否按下加減乘除
+ * @return {boolean}
+ */
+Abacus.prototype.isClickOp = function(){
+    return Object.keys(this.operate).includes(this.input);
 }
 
 /**

@@ -114,7 +114,8 @@
 <script src="./abacus.js"></script>
 <script>
     var screen = new Screen(document.getElementById("result"));
-    var abacus = new Abacus(screen);
+    var screen_expression = new Screen(document.getElementById("expression"));
+    var abacus = new Abacus(screen, screen_expression);
     function clickBtn(input){
         abacus.click(input);
     }
