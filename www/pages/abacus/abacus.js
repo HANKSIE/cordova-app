@@ -84,15 +84,16 @@ Abacus.prototype.click = function(input){
                 
                 //點擊的按鍵不是"="
                 if(!this.isClickEqual() ){
+                    this.hasAccessLeft = true;
                     this.left = result;
                     this.op = op;
                 }
             }
-        } 
+        }
 
         this.op = this.isClickEqual()?undefined:input;
-    }
 
+    }
 }
 
 /**
