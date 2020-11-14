@@ -73,78 +73,38 @@
             <div class="screen" id="result">0</div>
             <div class="panel">
                 <div class="segmented-control">
-                    <a class="control-item"><div class="cal-btn" onclick="append(7)">7</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(8)">8</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(9)">9</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('/')">/</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(7)">7</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(8)">8</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(9)">9</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('/')">/</div></a>
                 </div>
                 <div class="segmented-control">
-                    <a class="control-item"><div class="cal-btn" onclick="append(4)">4</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(5)">5</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(6)">6</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('x')">x</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(4)">4</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(5)">5</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(6)">6</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('x')">x</div></a>
                 </div>
                 <div class="segmented-control">
-                    <a class="control-item"><div class="cal-btn" onclick="append(1)">1</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(2)">2</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append(3)">3</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('-')">-</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(1)">1</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(2)">2</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(3)">3</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('-')">-</div></a>
                 </div>
                 <div class="segmented-control">
-                    <a class="control-item"><div class="cal-btn" onclick="append(0)">0</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('.')">.</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('=')">=</div></a>
-                    <a class="control-item"><div class="cal-btn" onclick="append('+')">+</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn(0)">0</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('.')">.</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('=')">=</div></a>
+                    <a class="control-item"><div class="cal-btn" onclick="clickBtn('+')">+</div></a>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script src="./abacus.js"></script>
 <script>
-    var num = undefined, sum = 0;
-    var op = undefined;
-    
-    const operate = {
-        "+": function(v1, v2){return parseInt(v1)+parseInt(v2)},
-        "-": function(v1, v2){return parseInt(v1)-parseInt(v2)},
-        "x": function(v1, v2){return parseInt(v1)*parseInt(v2)},
-        "/": function(v1, v2){return parseInt(v1)/parseInt(v2)},
-    }
-
-    function append(input){
-
-        
-        var result = document.getElementById("result");
-
-        if(result.innerHTML == 0){
-            if(!["+","-","x","/","="].includes(input)){
-                result.innerHTML = input;
-            }
-            return;
-        }
-
-        if(["+","-","x","/"].includes(input) && result.innerHTML != 0){
-            op = input;
-            return;
-        }
-
-        if(op && !num){
-            num = result.innerHTML;
-            result.innerHTML = input;
-            return;
-        }
-        
-        if(op && num && input == "="){
-            console.log(`${num} ${op} ${result.innerHTML}`)
-            ans = operate[op](num, result.innerHTML);
-            result.innerHTML = ans;
-            op = undefined;
-            num = undefined;
-            sum += ans;
-            return;
-        }
-
-        result.innerHTML = result.innerHTML + input; 
+    var abacus = new Abacus(new Screen(document.getElementById("result")));
+    function clickBtn(input){
+        abacus.click(input);
     }
 </script>
 </html>
