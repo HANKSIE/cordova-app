@@ -1,6 +1,15 @@
 /**
- * constructor
- * @param {Screen} screen - 計算機螢幕dom 
+ * @constructor
+ * 
+ * @param {Screen} screen - 計算機螢幕
+ * 
+ * @property {Screen} screen - 計算機螢幕
+ * @property {string} left - 左運算元(未轉換為number)
+ * @property {string} right - 右運算元(未轉換為number)
+ * @property {string} op - 運算子
+ * @property {bool} canAppend - 字串是否可以串接在目前螢幕上的數字之後
+ * @property {bool} hasAccessLeft - 是否正在存取left
+ * @property {object} operate - 運算子對應運算方法
  */
 function Abacus(screen){
     this.screen = screen; //螢幕dom
@@ -11,19 +20,15 @@ function Abacus(screen){
         "x": function(v1, v2){return v1 * v2},
         "/": function(v1, v2){return v1 / v2},
     };
-
-    this.canAppend = false;
-
     this.screen.write(0);
 }
 
 /**
  * 點擊按鍵
- * @param {String} input - 使用者點擊的按鍵指令 
+ * @param {string} input - 使用者點擊的按鍵指令 
  */
 Abacus.prototype.click = function(input){
     this.input = input;
-
     //小數點
     if(this.isClickPoint()){
         if(this.screen.read().indexOf(".") == -1){
@@ -41,29 +46,43 @@ Abacus.prototype.click = function(input){
     }
 
     if(this.isClickNumber()){ //整數
-        if(this.hasOp() && !this.canAppend){
+
+        this.hasAccessLeft = false;
+        
+        if((this.hasOp() && !this.canAppend)){
             this.screen.write(input);
             this.canAppend = !this.canAppend;
         }else{
             this.screen.append(input);
         }
+
     }else{ //運算子
-       if(this.hasTemp() && this.hasOp()){
-            var result = this.compute();
-            this.screen.write(result);
-            var op = this.op;
-            this.reset();
-            if(!this.isClickEqual() ){
-                this.op = op;
+
+        //螢幕上的值是否應為left值
+        if(!this.hasAccessLeft){
+            if(!this.hasLeft()){
+                this.left = this.screen.read();
+                this.hasAccessLeft = true;
+            } else if(!this.hasRight()){
+                this.right = this.screen.read();
             }
-        }
-        
-        this.temp = this.screen.read();
-    
-        //點擊的按鍵不是"="
-        if(!this.isClickEqual()){
-            this.op = input;
-        }
+
+            //計算
+            if(this.hasLeft() && this.hasOp() && this.hasRight()){
+                var result = this.compute();
+                this.screen.write(result);
+                var op = this.op;
+                this.reset();
+                
+                //點擊的按鍵不是"="
+                if(!this.isClickEqual() ){
+                    this.left = result;
+                    this.op = op;
+                }
+            }
+        } 
+
+        this.op = this.isClickEqual()?undefined:input;
     }
 
 }
@@ -73,13 +92,15 @@ Abacus.prototype.click = function(input){
  */
 Abacus.prototype.reset = function(){
     this.op = undefined;
-    this.temp = undefined;
+    this.left = undefined;
+    this.right = undefined;
     this.canAppend = false;
+    this.hasAccessLeft = false;
 }
 
 /**
  * 螢幕上是否只有"0"
- * @return {Boolean}
+ * @return {boolean}
  */
 Abacus.prototype.isOnlyZeroOnScreen = function(){
     return this.screen.read() == "0";
@@ -87,7 +108,7 @@ Abacus.prototype.isOnlyZeroOnScreen = function(){
 
 /**
  * 是否按下等於
- * @return {Boolean}
+ * @return {boolean}
  */
 Abacus.prototype.isClickEqual = function(){
     return this.input == "=";
@@ -95,7 +116,7 @@ Abacus.prototype.isClickEqual = function(){
 
 /**
  * 是否按下數字鍵
- * @return {Boolean}
+ * @return {boolean}
  */
 Abacus.prototype.isClickNumber = function(){
     return !isNaN(parseInt(this.input) || parseFloat(this.input));
@@ -103,7 +124,7 @@ Abacus.prototype.isClickNumber = function(){
 
 /**
  * 是否按下小數點
- * @return {Boolean}
+ * @return {boolean}
  */
 Abacus.prototype.isClickPoint = function(){
     return this.input == ".";
@@ -111,26 +132,34 @@ Abacus.prototype.isClickPoint = function(){
 
 /**
  * 是否有運算元
- * @return {Boolean}
+ * @return {boolean}
  */
 Abacus.prototype.hasOp = function(){
     return this.op !== undefined;
 }
 
 /**
- * 是否有數字暫存
- * @return {Boolean}
+ * left是否有定義
+ * @return {boolean}
  */
-Abacus.prototype.hasTemp = function(){
-    return this.temp !== undefined;
+Abacus.prototype.hasLeft = function(){
+    return this.left !== undefined;
+}
+
+/**
+ * right是否有定義
+ * @return {boolean}
+ */
+Abacus.prototype.hasRight = function(){
+    return this.right !== undefined;
 }
 
 /**
  * 計算
- * @return {Number}
+ * @return {number}
  */
 Abacus.prototype.compute = function(){
-   return this.operate[this.op](parseFloat(this.temp), parseFloat(this.screen.read()));
+   return this.operate[this.op](parseFloat(this.left), parseFloat(this.right));
 }
 
 //=========================================================
@@ -145,7 +174,7 @@ function Screen(screen){
 
 /**
  * 回傳螢幕上的字
- * @return {String}
+ * @return {string}
  */
 Screen.prototype.read = function(){
     return this.screen.innerHTML;
@@ -153,7 +182,7 @@ Screen.prototype.read = function(){
 
 /**
  * 輸出字串到螢幕上
- * @param {String} output - 顯示到螢幕上的字串
+ * @param {string} output - 顯示到螢幕上的字串
  */
 Screen.prototype.write = function(output){
     this.screen.innerHTML = output;
@@ -161,7 +190,7 @@ Screen.prototype.write = function(output){
 
 /**
  * 在螢幕的字串之後串接字串
- * @param {String} output - 顯示到螢幕上的字串
+ * @param {string} output - 顯示到螢幕上的字串
  */
 Screen.prototype.append = function(output){
     this.screen.innerHTML += output;
