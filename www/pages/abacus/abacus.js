@@ -91,7 +91,11 @@ Abacus.prototype.click = function(input){
                 this.canNumOverrideScreen = true;
             }
         }
-        this.op = this.isClickEqual()?undefined:input;
+
+       //點擊的按鍵不是"="
+       if(!this.isClickEqual() ){
+            this.op = input;
+        }
     }
 
     var showLeft, showRight;
