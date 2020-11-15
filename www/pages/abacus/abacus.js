@@ -15,8 +15,7 @@
  * @property {string} left - 左運算元(未轉換為number)
  * @property {string} right - 右運算元(未轉換為number)
  * @property {string} op - 運算子
- * @property {bool} canAppend - 字串是否可以串接在目前螢幕上的數字之後
- * @property {bool} hasAccessLeft - 是否正在存取left
+ * @property {bool} isAccessLeft - 是否正在存取left
  * @property {object} operate - 運算子對應運算方法
  */
 function Abacus(screen, expressionScreen){
@@ -40,74 +39,41 @@ function Abacus(screen, expressionScreen){
 Abacus.prototype.click = function(input){
     this.input = input;
 
-    //小數點
-    if(this.isClickPoint() && !this.canNumOverrideScreen){
-        if(this.screen.read().indexOf(".") == -1){
-            this.screen.append(input);
-        }
-    }else if(this.isOnlyZeroOnScreen()){  //畫面只有0
-        if(this.isClickNumber()){
-            this.screen.write(input);
-        }
-    }else if(this.isClickNumber()){ //整數
+    if(this.isClickNumber() || this.isClickPoint()){ //數字&小數點
+        var num = this[this.isAccessLeft?"left":"right"] + input;
 
-        this.hasAccessLeft = false;
+        if(!isNaN(num)){ //是數字
+            this[this.isAccessLeft?"left":"right"] = num;
+        }
+    }else { //運算元
 
-        if(this.hasOp() && !this.canAppend){
-            this.screen.write(input);
-            this.canAppend = !this.canAppend;
-            if(this.canNumOverrideScreen){
-                this.screen.write(input);
-                this.canNumOverrideScreen = false;
+        if(this.hasLeft() && this.hasOp() && this.hasRight()){
+            var result = this.compute().toString();
+            var op = this.op;
+            this.reset();
+            this.left = result;
+
+            if(this.isClickOp()){
+                this.op = op;
             }
-        }else{
-            this.screen.append(input);
-        }
-
-    }else{ //運算子
-        
-        //螢幕上的值是否應為left值
-        if(!this.hasAccessLeft){
-            if(!this.hasLeft()){
-                this.left = this.screen.read();
-                this.hasAccessLeft = true;
-            } else if(!this.hasRight()){
-                this.right = this.screen.read();
-            }
-
-            //計算
-            if(this.hasLeft() && this.hasOp() && this.hasRight()){
-                var result = this.compute();
-                this.screen.write(result);
-                var op = this.op;
-                this.reset();
-                
-                //點擊的按鍵不是"="
-                if(!this.isClickEqual() ){
-                    this.hasAccessLeft = true;
-                    this.left = result;
-                    this.op = op;
-                }
-                this.canNumOverrideScreen = true;
-            }
-        }
-
-       //點擊的按鍵不是"="
-       if(!this.isClickEqual() ){
-            this.op = input;
-        }
+        } 
     }
 
-    var showLeft, showRight;
+    var show = this.hasOp() && (this.isClickNumber() || this.isClickPoint())?this.right:this.left;
+    
+    this.screen.write(show.slice(show[0] == "0" && show[1] != "."?1:0));
 
-    if(this.hasOp() && this.isClickNumber()){ //有運算元而且按了數字(代表螢幕上的數字是right)
-        showRight = this.screen.read();
-    }else if(this.isClickNumber()){ //反之為left
-        showLeft = this.screen.read();
+    if(this.isClickOp()){
+        this.op = input;
+        this.isAccessLeft = !this.hasLeft();
     }
 
-    //算出答案後未將答案指定給left，但left不可能是''，所以若showLeft和left為空時，螢幕上的值就是left
-    this.expressionScreen.write(`${showLeft || this.left || this.screen.read()} ${this.op || ''} ${showRight || this.right || ''}`);
+    var showLeft = this.left, showRight = !this.isAccessLeft?this.right:"",
+
+    showLeft = showLeft.slice(showLeft[0] == "0" && showLeft[1] != "."?1:0);
+    showRight = showRight.slice(showRight[0] == "0" && showRight[1] != "."?1:0);
+
+    this.expressionScreen.write(`${showLeft} ${this.op || ""} ${showRight}`);
 }
 
 /**
@@ -115,27 +81,9 @@ Abacus.prototype.click = function(input){
  */
 Abacus.prototype.reset = function(){
     this.op = undefined;
-    this.left = undefined;
-    this.right = undefined;
-    this.canAppend = false;
-    this.hasAccessLeft = false;
-    this.canNumOverrideScreen = false;
-}
-
-/**
- * 螢幕上是否只有"0"
- * @return {boolean}
- */
-Abacus.prototype.isOnlyZeroOnScreen = function(){
-    return this.screen.read() == "0";
-}
-
-/**
- * 是否按下等於
- * @return {boolean}
- */
-Abacus.prototype.isClickEqual = function(){
-    return this.input == "=";
+    this.left = "0";
+    this.right = "0";
+    this.isAccessLeft = true;
 }
 
 /**
@@ -175,7 +123,7 @@ Abacus.prototype.hasOp = function(){
  * @return {boolean}
  */
 Abacus.prototype.hasLeft = function(){
-    return this.left !== undefined;
+    return this.left != "0";
 }
 
 /**
@@ -183,7 +131,7 @@ Abacus.prototype.hasLeft = function(){
  * @return {boolean}
  */
 Abacus.prototype.hasRight = function(){
-    return this.right !== undefined;
+    return this.right != "0";
 }
 
 /**
