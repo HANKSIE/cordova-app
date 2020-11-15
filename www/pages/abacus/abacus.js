@@ -28,8 +28,8 @@ function Abacus(screen, expressionScreen){
         "x": function(v1, v2){return v1 * v2},
         "/": function(v1, v2){return v1 / v2},
     };
-    this.screen.write(0);
-    this.expressionScreen.write(0);
+    this.screen.write(this.left);
+    this.expressionScreen.write(this.left);
 }
 
 /**
@@ -38,11 +38,18 @@ function Abacus(screen, expressionScreen){
  */
 Abacus.prototype.click = function(input){
     this.input = input;
+    var isComputeError = false;
 
     if(this.isClickNumber() || this.isClickPoint()){ //數字&小數點
-        var num = this[this.isAccessLeft?"left":"right"] + input;
+        var num = (this[this.isAccessLeft?"left":"right"] || "0") + input;
 
         if(!isNaN(num)){ //是數字
+
+            //開頭連續兩個0
+            if(num[0] == "0" && num[1] == "0"){
+                num = "0";
+            }
+
             this[this.isAccessLeft?"left":"right"] = num;
         }
     }else { //運算元
@@ -51,26 +58,39 @@ Abacus.prototype.click = function(input){
             var result = this.compute().toString();
             var op = this.op;
             this.reset();
-            this.left = result;
 
+            //計算結果為NaN或Infinity
+            if(!this.isNumber(result)){
+                alert(`不正確的運算式`);
+                this.left = "0";
+                isComputeError = true;
+            }else{
+                this.left = result;
+            }
+            
             if(this.isClickOp()){
                 this.op = op;
             }
         } 
     }
 
-    var show = this.hasOp() && (this.isClickNumber() || this.isClickPoint())?this.right:this.left;
+    var show = (this.hasOp() && (this.isClickNumber() || this.isClickPoint())?this.right:this.left) || "0";
     
-    this.screen.write(show.slice(show[0] == "0" && show[1] != "."?1:0));
+    this.screen.write(show.slice(show[0] == "0" && show[1] != "." && show.length > 1?1:0));
 
     if(this.isClickOp()){
-        this.op = input;
-        this.isAccessLeft = !this.hasLeft();
+        this.op = isComputeError?undefined:input;
+        this.isAccessLeft = false;
     }
 
-    var showLeft = this.left, showRight = !this.isAccessLeft?this.right:"",
+    if(this.isClickEqual()){
+        this.op = undefined;
+        this.isAccessLeft = true;
+    }
 
-    showLeft = showLeft.slice(showLeft[0] == "0" && showLeft[1] != "."?1:0);
+    var showLeft = this.left, showRight = !this.isAccessLeft?this.right || "0":"",
+
+    showLeft = showLeft.slice(showLeft[0] == "0" && showLeft[1] != "." && showLeft.length > 1?1:0);
     showRight = showRight.slice(showRight[0] == "0" && showRight[1] != "."?1:0);
 
     this.expressionScreen.write(`${showLeft} ${this.op || ""} ${showRight}`);
@@ -82,7 +102,7 @@ Abacus.prototype.click = function(input){
 Abacus.prototype.reset = function(){
     this.op = undefined;
     this.left = "0";
-    this.right = "0";
+    this.right = undefined;
     this.isAccessLeft = true;
 }
 
@@ -95,11 +115,19 @@ Abacus.prototype.isClickOp = function(){
 }
 
 /**
+ * 是否按下等於
+ * @return {boolean}
+ */
+Abacus.prototype.isClickEqual = function(){
+    return this.input == "=";
+}
+
+/**
  * 是否按下數字鍵
  * @return {boolean}
  */
 Abacus.prototype.isClickNumber = function(){
-    return !isNaN(parseInt(this.input) || parseFloat(this.input));
+    return this.isNumber(this.input);
 }
 
 /**
@@ -108,6 +136,15 @@ Abacus.prototype.isClickNumber = function(){
  */
 Abacus.prototype.isClickPoint = function(){
     return this.input == ".";
+}
+
+/**
+ * 是否為數字
+ * @param {number} val
+ * @return {boolean}
+ */
+Abacus.prototype.isNumber = function(val){
+    return !isNaN(val) && isFinite(val);
 }
 
 /**
@@ -123,7 +160,7 @@ Abacus.prototype.hasOp = function(){
  * @return {boolean}
  */
 Abacus.prototype.hasLeft = function(){
-    return this.left != "0";
+    return this.left !== undefined;
 }
 
 /**
@@ -131,7 +168,7 @@ Abacus.prototype.hasLeft = function(){
  * @return {boolean}
  */
 Abacus.prototype.hasRight = function(){
-    return this.right != "0";
+    return this.right !== undefined;
 }
 
 /**
