@@ -17,7 +17,7 @@
  * @property {string} op - 運算子
  * @property {bool} isAccessLeft - 是否正在存取left
  * @property {bool} isEndOfCompute - 是否計算結束
- * @property {object} operate - 運算子對應運算方法
+ * @property {object} operate - 運算子對應的運算方法
  */
 function Abacus(monitor, expressionMonitor){
     this.monitor = monitor; //螢幕dom
@@ -106,7 +106,7 @@ Abacus.prototype.click = function(input){
 }
 
 /**
- * 計算完後重新設置
+ * 重新設置計算所需變數
  */
 Abacus.prototype.reset = function(){
     this.op = undefined;
@@ -158,7 +158,7 @@ Abacus.prototype.isNumber = function(val){
 }
 
 /**
- * 是否有運算元
+ * 是否有運算子
  * @return {boolean}
  */
 Abacus.prototype.hasOp = function(){
