@@ -9,9 +9,9 @@
 /**
  * @constructor
  * 
- * @param {Screen} screen - 螢幕
- * @param {Screen} expressionScreen - 顯示運算式的螢幕
- * @property {Screen} screen - 計算機螢幕
+ * @param {Monitor} monitor - 螢幕
+ * @param {Monitor} expressionMonitor - 顯示運算式的螢幕
+ * @property {Monitor} monitor - 計算機螢幕
  * @property {string} left - 左運算元(未轉換為number)
  * @property {string} right - 右運算元(未轉換為number)
  * @property {string} op - 運算子
@@ -19,9 +19,9 @@
  * @property {bool} isEndOfCompute - 是否計算結束
  * @property {object} operate - 運算子對應運算方法
  */
-function Abacus(screen, expressionScreen){
-    this.screen = screen; //螢幕dom
-    this.expressionScreen = expressionScreen
+function Abacus(monitor, expressionMonitor){
+    this.monitor = monitor; //螢幕dom
+    this.expressionMonitor = expressionMonitor
     this.reset();
     this.operate = {
         "+": function(v1, v2){return v1 + v2},
@@ -29,8 +29,8 @@ function Abacus(screen, expressionScreen){
         "x": function(v1, v2){return v1 * v2},
         "/": function(v1, v2){return v1 / v2},
     };
-    this.screen.write(this.left);
-    this.expressionScreen.write(this.left);
+    this.monitor.write(this.left);
+    this.expressionMonitor.write(this.left);
 }
 
 /**
@@ -85,7 +85,7 @@ Abacus.prototype.click = function(input){
 
     var show = (this.hasOp() && (this.isClickNumber() || this.isClickPoint())?this.right:this.left) || "0";
     
-    this.screen.write(show);
+    this.monitor.write(show);
 
     if(this.isClickOp()){
         this.op = isComputeError?undefined:input;
@@ -102,7 +102,7 @@ Abacus.prototype.click = function(input){
     var showLeft = this.left;
     var showRight = !this.isAccessLeft?(this.right === undefined?"":this.right):"";
 
-    this.expressionScreen.write(`${showLeft} ${this.op || ""} ${showRight}`);
+    this.expressionMonitor.write(`${showLeft} ${this.op || ""} ${showRight}`);
 }
 
 /**
@@ -192,39 +192,39 @@ Abacus.prototype.compute = function(){
 /**
  * ========================================================
  * 
- * 處理screenDom文字讀寫
+ * 處理Dom文字讀寫
  * 
  * ========================================================
  */
 
 /**
  * constructor
- * @param {Element} screen - 計算機螢幕dom 
+ * @param {Element} monitor - 計算機螢幕dom 
  */
-function Screen(screen){
-    this.screen = screen; //螢幕dom
+function Monitor(monitor){
+    this.monitor = monitor; //螢幕dom
 }
 
 /**
  * 回傳螢幕上的字
  * @return {string}
  */
-Screen.prototype.read = function(){
-    return this.screen.innerHTML;
+Monitor.prototype.read = function(){
+    return this.monitor.innerHTML;
 }
 
 /**
  * 輸出字串到螢幕上
  * @param {string} output - 顯示到螢幕上的字串
  */
-Screen.prototype.write = function(output){
-    this.screen.innerHTML = output;
+Monitor.prototype.write = function(output){
+    this.monitor.innerHTML = output;
 }
 
 /**
  * 在螢幕的字串之後串接字串
  * @param {string} output - 顯示到螢幕上的字串
  */
-Screen.prototype.append = function(output){
-    this.screen.innerHTML += output;
+Monitor.prototype.append = function(output){
+    this.monitor.innerHTML += output;
 }
