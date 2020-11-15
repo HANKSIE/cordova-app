@@ -16,6 +16,7 @@
  * @property {string} right - 右運算元(未轉換為number)
  * @property {string} op - 運算子
  * @property {bool} isAccessLeft - 是否正在存取left
+ * @property {bool} isEndOfCompute - 是否計算結束
  * @property {object} operate - 運算子對應運算方法
  */
 function Abacus(screen, expressionScreen){
@@ -41,19 +42,24 @@ Abacus.prototype.click = function(input){
     var isComputeError = false;
 
     if(this.isClickNumber() || this.isClickPoint()){ //數字&小數點
-        var num = (this[this.isAccessLeft?"left":"right"] || "0") + input;
+        var num = this[this.isAccessLeft?"left":"right"] || "0";
+
+        num = (num == "0" && this.isClickNumber())?input:num.toString() + input;
 
         if(!isNaN(num)){ //是數字
 
-            //開頭連續兩個0
-            if(num[0] == "0" && num[1] == "0"){
-                num = "0";
+            //結束計算
+            if(this.isEndOfCompute){
+                //如果結束計算後點擊小數點，設為"0."，反之設數字
+                num = this.isClickPoint()?"0.":input;
+                this.isEndOfCompute = false;
             }
 
             this[this.isAccessLeft?"left":"right"] = num;
         }
-    }else { //運算元
+    }else { //運算元(加減乘除)
 
+        //計算
         if(this.hasLeft() && this.hasOp() && this.hasRight()){
             var result = this.compute().toString();
             var op = this.op;
@@ -71,12 +77,14 @@ Abacus.prototype.click = function(input){
             if(this.isClickOp()){
                 this.op = op;
             }
+            
+            this.isEndOfCompute = true;
         } 
     }
 
     var show = (this.hasOp() && (this.isClickNumber() || this.isClickPoint())?this.right:this.left) || "0";
     
-    this.screen.write(show.slice(show[0] == "0" && show[1] != "." && show.length > 1?1:0));
+    this.screen.write(show);
 
     if(this.isClickOp()){
         this.op = isComputeError?undefined:input;
@@ -88,10 +96,8 @@ Abacus.prototype.click = function(input){
         this.isAccessLeft = true;
     }
 
-    var showLeft = this.left, showRight = !this.isAccessLeft?this.right || "0":"",
-
-    showLeft = showLeft.slice(showLeft[0] == "0" && showLeft[1] != "." && showLeft.length > 1?1:0);
-    showRight = showRight.slice(showRight[0] == "0" && showRight[1] != "."?1:0);
+    var showLeft = this.left;
+    var showRight = !this.isAccessLeft?(this.right === undefined?"":this.right):"";
 
     this.expressionScreen.write(`${showLeft} ${this.op || ""} ${showRight}`);
 }
@@ -104,6 +110,7 @@ Abacus.prototype.reset = function(){
     this.left = "0";
     this.right = undefined;
     this.isAccessLeft = true;
+    this.isEndOfCompute = false;
 }
 
 /**
