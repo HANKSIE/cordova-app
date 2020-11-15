@@ -89,7 +89,9 @@ Abacus.prototype.click = function(input){
 
     if(this.isClickOp()){
         this.op = isComputeError?undefined:input;
-        this.isAccessLeft = false;
+
+        //計算有誤則繼續存取的變數為left
+        this.isAccessLeft = isComputeError;
     }
 
     if(this.isClickEqual()){
