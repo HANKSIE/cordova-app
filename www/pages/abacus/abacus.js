@@ -42,21 +42,22 @@ Abacus.prototype.click = function(input){
     var isComputeError = false;
 
     if(this.isClickNumber() || this.isClickPoint()){ //數字&小數點
+        
         var num = this[this.isAccessLeft?"left":"right"] || "0";
 
         num = (num == "0" && this.isClickNumber())?input:num.toString() + input;
 
+        //結束計算
+        if(this.isEndOfCompute){
+            //如果結束計算後點擊小數點，設為"0."，反之設數字
+            num = this.isClickPoint()?"0.":input;
+            this.isEndOfCompute = false;
+        }
+
         if(!isNaN(num)){ //是數字
-
-            //結束計算
-            if(this.isEndOfCompute){
-                //如果結束計算後點擊小數點，設為"0."，反之設數字
-                num = this.isClickPoint()?"0.":input;
-                this.isEndOfCompute = false;
-            }
-
             this[this.isAccessLeft?"left":"right"] = num;
         }
+
     }else { //運算元(加減乘除)
 
         //計算
